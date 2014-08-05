@@ -10,4 +10,8 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<YSchedule, ScheduleId> {
     @Query("SELECT x FROM YSchedule x JOIN FETCH x.participants JOIN x.proposedDates ORDER BY x.updatedAt DESC")
     List<YSchedule> findAllDetails();
+
+    @Query("SELECT NEW yachosan.domain.repository.schedule.ScheduleSummary(x.scheduleId, x.scheduleName, x.scheduleDescription, x.createdAt, x.updatedAt) " +
+            "FROM YSchedule x  ORDER BY x.updatedAt DESC")
+    List<ScheduleSummary> findAllSummaries();
 }

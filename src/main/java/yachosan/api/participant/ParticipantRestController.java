@@ -20,13 +20,13 @@ public class ParticipantRestController {
     ScheduleRepository scheduleRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    List<YParticipant> getParticipants(@PathVariable("scheduleId") String scheduleId) {
-        return scheduleRepository.findOne(ScheduleId.of(scheduleId)).getParticipants();
+    List<YParticipant> getParticipants(@PathVariable("scheduleId") ScheduleId scheduleId) {
+        return scheduleRepository.findOne(scheduleId).getParticipants();
     }
 
     @RequestMapping(value = "{nickname}", method = RequestMethod.GET)
-    YParticipant getParticipant(@PathVariable("scheduleId") String scheduleId, @PathVariable("nickname") String nickname) {
-        YParticipant participant = scheduleRepository.findOne(ScheduleId.of(scheduleId)).getParticipants().stream()
+    YParticipant getParticipant(@PathVariable("scheduleId") ScheduleId scheduleId, @PathVariable("nickname") String nickname) {
+        YParticipant participant = scheduleRepository.findOne(scheduleId).getParticipants().stream()
                 .filter(p -> Objects.equals(p.getParticipantPk().getNickname(), nickname))
                 .findFirst().get();
         return participant;

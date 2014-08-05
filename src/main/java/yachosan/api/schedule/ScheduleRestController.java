@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import yachosan.domain.model.ScheduleId;
 import yachosan.domain.model.YSchedule;
 import yachosan.domain.repository.schedule.ScheduleRepository;
+import yachosan.domain.repository.schedule.ScheduleSummary;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -19,13 +20,13 @@ public class ScheduleRestController {
 
 
     @RequestMapping(method = RequestMethod.GET)
-    List<YSchedule> getSchedules() {
-        return scheduleRepository.findAllDetails();
+    List<ScheduleSummary> getSchedules() {
+        return scheduleRepository.findAllSummaries();
     }
 
     @RequestMapping(value = "{scheduleId}", method = RequestMethod.GET)
-    YSchedule getSchedule(@PathVariable("scheduleId") String scheduleId) {
-        YSchedule schedule = scheduleRepository.findOne(ScheduleId.of(scheduleId));
+    YSchedule getSchedule(@PathVariable("scheduleId") ScheduleId scheduleId) {
+        YSchedule schedule = scheduleRepository.findOne(scheduleId);
         return schedule;
     }
 }

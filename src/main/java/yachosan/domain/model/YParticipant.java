@@ -28,11 +28,6 @@ public class YParticipant implements Serializable {
     @JsonUnwrapped
     private ParticipantPk participantPk;
 
-    @Transient
-    public ParticipantPk getFoo() {
-        return new ParticipantPk(ScheduleId.of("550e8400-e29b-41d4-a716-446655440000"), "hoge");
-    }
-
     /**
      * パスワード
      */

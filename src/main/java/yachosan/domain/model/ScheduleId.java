@@ -3,6 +3,7 @@ package yachosan.domain.model;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
+@JsonSerialize(using = ScheduleId.ScheduleIdSerializer.class)
 public class ScheduleId implements Serializable {
     @Size(min = 36, max = 36)
     @NotNull
