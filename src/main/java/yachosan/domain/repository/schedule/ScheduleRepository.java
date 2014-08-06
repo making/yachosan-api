@@ -6,9 +6,12 @@ import yachosan.domain.model.ScheduleId;
 import yachosan.domain.model.YSchedule;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<YSchedule, ScheduleId> {
-    @Query("SELECT x FROM YSchedule x JOIN FETCH x.participants JOIN x.proposedDates ORDER BY x.updatedAt DESC")
+    Optional<YSchedule> findByScheduleId(ScheduleId scheduleId);
+
+    @Query("SELECT DISTINCT x FROM YSchedule x JOIN FETCH x.participants JOIN x.proposedDates ORDER BY x.updatedAt DESC")
     List<YSchedule> findAllDetails();
 
     @Query("SELECT NEW yachosan.domain.repository.schedule.ScheduleSummary(x.scheduleId, x.scheduleName, x.scheduleDescription, x.createdAt, x.updatedAt) " +

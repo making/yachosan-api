@@ -1,7 +1,9 @@
 package yachosan;
 
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import yachosan.domain.model.ProposedDate;
+import yachosan.domain.model.ScheduleId;
 import yachosan.infra.converter.ScheduleIdConverter;
 
 import javax.sql.DataSource;
@@ -44,6 +48,14 @@ public class AppConfig {
     @Bean
     JSR310Module jsr310Module() {
         return new JSR310Module();
+    }
+
+    @Bean
+    Module yachosanModule() {
+        SimpleModule module = new SimpleModule();
+        module.addKeyDeserializer(ScheduleId.class, new ScheduleId.ScheduleIdKeyDeserializer());
+        module.addKeyDeserializer(ProposedDate.class, new ProposedDate.ProposedDateKeyDeserializer());
+        return module;
     }
 
     @Bean
