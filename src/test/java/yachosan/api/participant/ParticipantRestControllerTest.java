@@ -23,6 +23,7 @@ import yachosan.domain.repository.schedule.ScheduleRepository;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -130,6 +131,18 @@ public class ParticipantRestControllerTest {
 
     @Test
     public void testGetParticipant() throws Exception {
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.GET, null /* body,header */,
+                YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getBody(), is(tarou));
+    }
 
+    @Test
+    public void testGetParticipant_NotFound() throws Exception {
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.GET, null /* body,header */,
+                YParticipant.class, Collections.singletonMap("nickname", "foobar"));
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
 }
