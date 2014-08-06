@@ -1,4 +1,6 @@
 spring:
+  main:
+    show-banner: false
   datasource:
     url: jdbc:h2:file:${yachosan.h2.datadir:/tmp}/yachosan
   main:

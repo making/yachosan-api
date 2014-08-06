@@ -14,7 +14,8 @@ import yachosan.domain.repository.schedule.ScheduleSummary;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 @RestController
 @RequestMapping("api/v1/schedules")
 public class ScheduleRestController {

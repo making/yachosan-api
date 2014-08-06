@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<YParticipant, ParticipantPk> {
-    @Query("SELECT DISTINCT x FROM YParticipant x JOIN FETCH x.replies JOIN FETCH x.schedule WHERE x.participantPk.scheduleId = :scheduleId")
+    @Query("SELECT DISTINCT x FROM YParticipant x JOIN FETCH x.replies JOIN FETCH x.schedule WHERE x.participantPk.scheduleId = :scheduleId ORDER BY x.participantPk.nickname ASC")
     List<YParticipant> findByScheduleId(@Param("scheduleId") ScheduleId scheduleId);
 
     Optional<YParticipant> findByParticipantPk(ParticipantPk participantPk);
