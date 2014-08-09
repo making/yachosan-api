@@ -20,6 +20,7 @@ import yachosan.domain.model.*;
 import yachosan.domain.repository.participant.ParticipantRepository;
 import yachosan.domain.repository.schedule.ScheduleRepository;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -128,6 +129,7 @@ public class ParticipantRestControllerTest {
         ResponseEntity<YParticipant> response = restTemplate.exchange(apiEndpoint,
                 HttpMethod.POST, new HttpEntity<>(yamada), YParticipant.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getHeaders().getLocation(), is(new URI(apiEndpoint + "/yamada")));
         YParticipant created = response.getBody();
         yamada.getParticipantPk().setScheduleId(scheduleId);
 
@@ -155,6 +157,7 @@ public class ParticipantRestControllerTest {
         ResponseEntity<YParticipant> response = restTemplate.exchange(apiEndpoint,
                 HttpMethod.POST, new HttpEntity<>(yamada), YParticipant.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getHeaders().getLocation(), is(new URI(apiEndpoint + "/yamada")));
         YParticipant created = response.getBody();
         yamada.getParticipantPk().setScheduleId(scheduleId);
         yamada.setPassword(Password.MASKED); // password will be hidden

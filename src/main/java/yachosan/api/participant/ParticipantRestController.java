@@ -5,6 +5,7 @@ import org.dozer.Mapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import yachosan.api.ResponseEntites;
 import yachosan.domain.model.Password;
 import yachosan.domain.model.ScheduleId;
@@ -12,6 +13,7 @@ import yachosan.domain.model.YParticipant;
 import yachosan.domain.service.participant.ParticipantService;
 
 import javax.inject.Inject;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +31,13 @@ public class ParticipantRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<YParticipant> postParticipants(@PathVariable("scheduleId") ScheduleId scheduleId, @RequestBody YParticipant participant) {
+    ResponseEntity<YParticipant> postParticipants(@PathVariable("scheduleId") ScheduleId scheduleId, @RequestBody YParticipant participant,
+                                                  UriComponentsBuilder uriBuilder) {
         participant.getParticipantPk().setScheduleId(scheduleId);
         YParticipant created = participantService.create(participant, Optional.ofNullable(participant.getPassword()));
-        return ResponseEntites.created(created);
+        URI location = uriBuilder.path("api/v1/schedules/{scheduleId}/participants/{nickname}")
+                .buildAndExpand(scheduleId, created.getParticipantPk().getNickname()).toUri();
+        return ResponseEntites.created(created, location);
     }
 
     @RequestMapping(value = "{nickname}", method = RequestMethod.GET)

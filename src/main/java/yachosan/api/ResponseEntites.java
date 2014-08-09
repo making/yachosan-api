@@ -1,9 +1,11 @@
 package yachosan.api;
 
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
 import java.util.Optional;
 
 public class ResponseEntites {
@@ -12,8 +14,10 @@ public class ResponseEntites {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    public static <T> ResponseEntity<T> created(T body) {
-        return new ResponseEntity<>(body, HttpStatus.CREATED);
+    public static <T> ResponseEntity<T> created(T body, URI location) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
+        return new ResponseEntity<>(body, headers, HttpStatus.CREATED);
     }
 
 
