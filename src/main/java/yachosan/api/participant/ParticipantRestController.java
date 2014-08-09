@@ -30,7 +30,6 @@ public class ParticipantRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<YParticipant> postParticipants(@PathVariable("scheduleId") ScheduleId scheduleId, @RequestBody YParticipant participant) {
-        System.out.println(participant);
         participant.getParticipantPk().setScheduleId(scheduleId);
         YParticipant created = participantRepository.save(participant);
         return ResponseEntites.created(created);
@@ -49,7 +48,6 @@ public class ParticipantRestController {
         Optional<YParticipant> participant = participantRepository.findByParticipantPk(new ParticipantPk(scheduleId, nickname));
         return ResponseEntites.okIfPresent(participant.map(p -> {
             dozerMapper.map(update, p);
-            System.out.println(p);
             return participantRepository.save(p);
         }));
     }

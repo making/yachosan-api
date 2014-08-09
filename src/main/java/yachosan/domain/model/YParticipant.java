@@ -31,8 +31,8 @@ public class YParticipant implements Serializable {
     /**
      * パスワード
      */
-    @Size(max = 255)
-    private char[] password;
+    @Embedded
+    private Password password;
     /**
      * 一言
      */

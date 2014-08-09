@@ -55,6 +55,7 @@ public class YSchedule implements Serializable {
      * 参加者リスト
      */
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    @OrderBy("participantPk.nickname ASC")
     private List<YParticipant> participants;
     /**
      * 合言葉

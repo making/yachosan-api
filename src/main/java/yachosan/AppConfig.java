@@ -17,8 +17,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import yachosan.domain.model.Password;
 import yachosan.domain.model.ProposedDate;
 import yachosan.domain.model.ScheduleId;
+import yachosan.infra.password.PasswordDeserializer;
+import yachosan.infra.password.PasswordSerializer;
 import yachosan.infra.proposeddate.ProposedDateDeserializer;
 import yachosan.infra.proposeddate.ProposedDateKeyDeserializer;
 import yachosan.infra.proposeddate.ProposedDateSerializer;
@@ -69,6 +72,9 @@ public class AppConfig {
         module.addSerializer(ProposedDate.class, new ProposedDateSerializer());
         module.addDeserializer(ProposedDate.class, new ProposedDateDeserializer());
         module.addKeyDeserializer(ProposedDate.class, new ProposedDateKeyDeserializer());
+
+        module.addSerializer(Password.class, new PasswordSerializer());
+        module.addDeserializer(Password.class, new PasswordDeserializer());
         return module;
     }
 

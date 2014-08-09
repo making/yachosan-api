@@ -1,5 +1,6 @@
 package yachosan.api.participant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +41,8 @@ public class ParticipantRestControllerTest {
     ParticipantRepository participantRepository;
     @Autowired
     ScheduleRepository scheduleRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Value("${local.server.port}")
     int port;
@@ -87,6 +91,12 @@ public class ParticipantRestControllerTest {
         participantRepository.save(Arrays.asList(tarou, hanako));
 
         apiEndpoint = "http://localhost:" + port + "/api/v1/schedules/" + scheduleId.getValue() + "/participants";
+
+        ((MappingJackson2HttpMessageConverter) restTemplate.getMessageConverters()
+                .stream()
+                .filter(x -> x instanceof MappingJackson2HttpMessageConverter)
+                .findFirst()
+                .get()).setObjectMapper(objectMapper);
     }
 
     @Test
@@ -129,6 +139,35 @@ public class ParticipantRestControllerTest {
                 new ParameterizedTypeReference<List<YParticipant>>() {
                 }).getBody().size(), is(3));
     }
+
+
+    @Test
+    public void testPostParticipants_withPassword() throws Exception {
+        YParticipant yamada = new YParticipant();
+        yamada.setComment("多分いけます");
+        yamada.setParticipantPk(new ParticipantPk(null, "yamada"));
+        yamada.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
+            put(ProposedDate.fromString("2014-08-01"), Reply.MAYBE);
+            put(ProposedDate.fromString("2014-08-02"), Reply.MAYBE);
+            put(ProposedDate.fromString("2014-08-03"), Reply.MAYBE);
+        }});
+        yamada.setPassword(new Password.UnmaskedPassword("hogehoge"));
+
+        ResponseEntity<YParticipant> response = restTemplate.exchange(apiEndpoint,
+                HttpMethod.POST, new HttpEntity<>(yamada), YParticipant.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        YParticipant created = response.getBody();
+        yamada.getParticipantPk().setScheduleId(scheduleId);
+        yamada.setPassword(Password.MASKED); // password will be hidden
+
+        assertThat(created, is(yamada));
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(3));
+    }
+
 
     @Test
     public void testPutParticipant_comment() throws Exception {
