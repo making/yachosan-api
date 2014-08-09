@@ -24,11 +24,11 @@ import yachosan.domain.repository.schedule.ScheduleRepository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.class)
@@ -70,7 +70,7 @@ public class ParticipantRestControllerTest {
         tarou.setComment("よろしくお願いします！");
         tarou.setEmail("tarou@example.com");
         tarou.setParticipantPk(new ParticipantPk(scheduleId, "tarou"));
-        tarou.setReplies(new HashMap<ProposedDate, Reply>() {{
+        tarou.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
             put(ProposedDate.fromString("2014-08-01"), Reply.OK);
             put(ProposedDate.fromString("2014-08-02"), Reply.OK);
             put(ProposedDate.fromString("2014-08-03"), Reply.MAYBE);
@@ -78,7 +78,7 @@ public class ParticipantRestControllerTest {
 
         hanako = new YParticipant();
         hanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
-        hanako.setReplies(new HashMap<ProposedDate, Reply>() {{
+        hanako.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
             put(ProposedDate.fromString("2014-08-01"), Reply.NG);
             put(ProposedDate.fromString("2014-08-02"), Reply.OK);
             put(ProposedDate.fromString("2014-08-03"), Reply.NG);
@@ -109,8 +109,8 @@ public class ParticipantRestControllerTest {
     public void testPostParticipants() throws Exception {
         YParticipant yamada = new YParticipant();
         yamada.setComment("多分いけます");
-        yamada.setParticipantPk(new ParticipantPk(scheduleId, "yamadau"));
-        yamada.setReplies(new HashMap<ProposedDate, Reply>() {{
+        yamada.setParticipantPk(new ParticipantPk(null, "yamada"));
+        yamada.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
             put(ProposedDate.fromString("2014-08-01"), Reply.MAYBE);
             put(ProposedDate.fromString("2014-08-02"), Reply.MAYBE);
             put(ProposedDate.fromString("2014-08-03"), Reply.MAYBE);
@@ -120,6 +120,7 @@ public class ParticipantRestControllerTest {
                 HttpMethod.POST, new HttpEntity<>(yamada), YParticipant.class);
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
         YParticipant created = response.getBody();
+        yamada.getParticipantPk().setScheduleId(scheduleId);
 
         assertThat(created, is(yamada));
 
@@ -127,6 +128,93 @@ public class ParticipantRestControllerTest {
                 apiEndpoint, HttpMethod.GET, null /* body,header */,
                 new ParameterizedTypeReference<List<YParticipant>>() {
                 }).getBody().size(), is(3));
+    }
+
+    @Test
+    public void testPutParticipant_comment() throws Exception {
+        YParticipant newTarou = new YParticipant();
+        newTarou.setComment("楽しみです！");
+        newTarou.setParticipantPk(new ParticipantPk(scheduleId, "tarou"));
+
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newTarou),
+                YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        YParticipant updated = response.getBody();
+
+        newTarou.setEmail(tarou.getEmail());
+        newTarou.setPassword(tarou.getPassword());
+        newTarou.setReplies(tarou.getReplies());
+
+        assertThat(updated, is(newTarou));
+        System.out.println(updated);
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(2));
+    }
+
+    @Test
+    public void testPutParticipant_comment_allReplies() throws Exception {
+        YParticipant newTarou = new YParticipant();
+        newTarou.setComment("やっぱ無理かも");
+        newTarou.setParticipantPk(new ParticipantPk(scheduleId, "tarou"));
+        newTarou.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
+            put(ProposedDate.fromString("2014-08-01"), Reply.MAYBE);
+            put(ProposedDate.fromString("2014-08-02"), Reply.NG);
+            put(ProposedDate.fromString("2014-08-03"), Reply.NG);
+        }});
+
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newTarou),
+                YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        YParticipant updated = response.getBody();
+
+        newTarou.setEmail(tarou.getEmail());
+        newTarou.setPassword(tarou.getPassword());
+
+        assertThat(updated, is(newTarou));
+        System.out.println(updated);
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(2));
+    }
+
+    @Test
+    public void testPutParticipant_comment_partialReplies() throws Exception {
+        YParticipant newTarou = new YParticipant();
+        newTarou.setComment("厳しくなった");
+        newTarou.setParticipantPk(new ParticipantPk(scheduleId, "tarou"));
+        newTarou.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
+            put(ProposedDate.fromString("2014-08-02"), Reply.NG);
+            put(ProposedDate.fromString("2014-08-03"), Reply.NG);
+        }});
+
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newTarou),
+                YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        YParticipant updated = response.getBody();
+
+        newTarou.setEmail(tarou.getEmail());
+        newTarou.setPassword(tarou.getPassword());
+        newTarou.setReplies(new LinkedHashMap<ProposedDate, Reply>() {{
+            put(ProposedDate.fromString("2014-08-01"), Reply.OK);
+            put(ProposedDate.fromString("2014-08-02"), Reply.NG);
+            put(ProposedDate.fromString("2014-08-03"), Reply.NG);
+        }});
+
+        assertThat(updated, is(newTarou));
+        System.out.println(updated);
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(2));
     }
 
     @Test
@@ -145,4 +233,5 @@ public class ParticipantRestControllerTest {
                 YParticipant.class, Collections.singletonMap("nickname", "foobar"));
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
+
 }

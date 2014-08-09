@@ -1,7 +1,9 @@
 package yachosan.api.participant;
 
 
+import org.dozer.Mapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import yachosan.api.ResponseEntites;
 import yachosan.domain.model.ParticipantPk;
@@ -18,6 +20,8 @@ import java.util.Optional;
 public class ParticipantRestController {
     @Inject
     ParticipantRepository participantRepository;
+    @Inject
+    Mapper dozerMapper;
 
     @RequestMapping(method = RequestMethod.GET)
     List<YParticipant> getParticipants(@PathVariable("scheduleId") ScheduleId scheduleId) {
@@ -26,6 +30,7 @@ public class ParticipantRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<YParticipant> postParticipants(@PathVariable("scheduleId") ScheduleId scheduleId, @RequestBody YParticipant participant) {
+        System.out.println(participant);
         participant.getParticipantPk().setScheduleId(scheduleId);
         YParticipant created = participantRepository.save(participant);
         return ResponseEntites.created(created);
@@ -35,5 +40,17 @@ public class ParticipantRestController {
     ResponseEntity<YParticipant> getParticipant(@PathVariable("scheduleId") ScheduleId scheduleId, @PathVariable("nickname") String nickname) {
         Optional<YParticipant> participant = participantRepository.findByParticipantPk(new ParticipantPk(scheduleId, nickname));
         return ResponseEntites.okIfPresent(participant);
+    }
+
+
+    @RequestMapping(value = "{nickname}", method = RequestMethod.PUT)
+    ResponseEntity<YParticipant> putParticipant(@PathVariable("scheduleId") ScheduleId scheduleId, @PathVariable("nickname") String nickname,
+                                                @Validated @RequestBody YParticipant update) {
+        Optional<YParticipant> participant = participantRepository.findByParticipantPk(new ParticipantPk(scheduleId, nickname));
+        return ResponseEntites.okIfPresent(participant.map(p -> {
+            dozerMapper.map(update, p);
+            System.out.println(p);
+            return participantRepository.save(p);
+        }));
     }
 }

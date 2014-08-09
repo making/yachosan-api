@@ -1,4 +1,4 @@
-package yachosan.infra.idgenerator;
+package yachosan.infra.scheduleid;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;

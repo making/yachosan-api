@@ -27,7 +27,7 @@ public class YSchedule implements Serializable {
      */
     @EmbeddedId
     @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "yachosan.infra.idgenerator.ScheduleIdGenerator")
+    @GenericGenerator(name = "uuid", strategy = "yachosan.infra.scheduleid.ScheduleIdGenerator")
     private ScheduleId scheduleId;
 
     /**

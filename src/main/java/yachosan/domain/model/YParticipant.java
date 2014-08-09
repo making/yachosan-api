@@ -32,7 +32,7 @@ public class YParticipant implements Serializable {
      * パスワード
      */
     @Size(max = 255)
-    private String password;
+    private char[] password;
     /**
      * 一言
      */

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
+import org.dozer.spring.DozerBeanMapperFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
@@ -14,9 +15,17 @@ import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import yachosan.domain.model.ProposedDate;
 import yachosan.domain.model.ScheduleId;
-import yachosan.infra.converter.ScheduleIdConverter;
+import yachosan.infra.proposeddate.ProposedDateDeserializer;
+import yachosan.infra.proposeddate.ProposedDateKeyDeserializer;
+import yachosan.infra.proposeddate.ProposedDateSerializer;
+import yachosan.infra.scheduleid.ScheduleIdConverter;
+import yachosan.infra.scheduleid.ScheduleIdDeserializer;
+import yachosan.infra.scheduleid.ScheduleIdKeyDeserializer;
+import yachosan.infra.scheduleid.ScheduleIdSerializer;
 
 import javax.sql.DataSource;
 
@@ -53,8 +62,13 @@ public class AppConfig {
     @Bean
     Module yachosanModule() {
         SimpleModule module = new SimpleModule();
-        module.addKeyDeserializer(ScheduleId.class, new ScheduleId.ScheduleIdKeyDeserializer());
-        module.addKeyDeserializer(ProposedDate.class, new ProposedDate.ProposedDateKeyDeserializer());
+        module.addSerializer(ScheduleId.class, new ScheduleIdSerializer());
+        module.addDeserializer(ScheduleId.class, new ScheduleIdDeserializer());
+        module.addKeyDeserializer(ScheduleId.class, new ScheduleIdKeyDeserializer());
+
+        module.addSerializer(ProposedDate.class, new ProposedDateSerializer());
+        module.addDeserializer(ProposedDate.class, new ProposedDateDeserializer());
+        module.addKeyDeserializer(ProposedDate.class, new ProposedDateKeyDeserializer());
         return module;
     }
 
@@ -68,6 +82,15 @@ public class AppConfig {
         // customize
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return objectMapper;
+    }
+
+    @Bean
+    DozerBeanMapperFactoryBean dozerMapper() throws Exception {
+        DozerBeanMapperFactoryBean factoryBean = new DozerBeanMapperFactoryBean();
+        ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
+        editor.setAsText("classpath*:/dozer/**/*.xml");
+        factoryBean.setMappingFiles((Resource[]) editor.getValue());
+        return factoryBean;
     }
 
     @Bean
