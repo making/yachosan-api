@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import net.sf.log4jdbc.Log4jdbcProxyDataSource;
+import net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy;
 import org.dozer.spring.DozerBeanMapperFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -54,7 +54,7 @@ public class AppConfig {
 
     @Bean
     DataSource dataSource() {
-        return new Log4jdbcProxyDataSource(this.dataSource);
+        return new DataSourceSpy(this.dataSource);
     }
 
     @Bean
