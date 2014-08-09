@@ -8,6 +8,7 @@ import yachosan.domain.repository.schedule.ScheduleSummary;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,5 +24,17 @@ public class ScheduleService {
 
     public Optional<YSchedule> findOne(ScheduleId scheduleId) {
         return scheduleRepository.findByScheduleId(scheduleId);
+    }
+
+    public YSchedule create(YSchedule schedule) {
+        LocalDateTime now = LocalDateTime.now();
+        schedule.setCreatedAt(now);
+        schedule.setUpdatedAt(now);
+        return scheduleRepository.save(schedule);
+    }
+
+    public YSchedule update(YSchedule schedule) {
+        schedule.setUpdatedAt(LocalDateTime.now());
+        return scheduleRepository.save(schedule);
     }
 }

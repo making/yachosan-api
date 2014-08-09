@@ -10,6 +10,7 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import yachosan.domain.repository.participant.ParticipantRepository;
 import yachosan.domain.repository.schedule.ScheduleRepository;
 import yachosan.domain.repository.schedule.ScheduleSummary;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -130,4 +133,43 @@ public class ScheduleRestControllerTest {
         assertThat(response.getBody(), is(nomikai));
     }
 
+
+    @Test
+    public void testPostSchedules() throws Exception {
+        YSchedule kangeikai = new YSchedule();
+        kangeikai.setScheduleName("歓迎会");
+        kangeikai.setScheduleDescription("山田さんの歓迎会です。");
+        ResponseEntity<YSchedule> response = restTemplate.exchange(apiEndpoint,
+                HttpMethod.POST, new HttpEntity<>(kangeikai), YSchedule.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        YSchedule created = response.getBody();
+
+        assertThat(created.getScheduleId(), is(notNullValue()));
+        assertThat(created.getScheduleId().getValue(), is(notNullValue()));
+        assertThat(created.getScheduleName(), is(kangeikai.getScheduleName()));
+        assertThat(created.getScheduleDescription(), is(kangeikai.getScheduleDescription()));
+        assertThat(response.getHeaders().getLocation(), is(new URI(apiEndpoint + "/" + created.getScheduleId().getValue())));
+
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<ScheduleSummary>>() {
+                }).getBody().size(), is(2));
+    }
+
+
+    @Test
+    public void testPutSchedule() throws Exception {
+        YSchedule newNomikai = new YSchedule();
+        newNomikai.setScheduleName("飲み会");
+        newNomikai.setScheduleDescription("期限はもう少しです。");
+        ResponseEntity<YSchedule> response = restTemplate.exchange(
+                apiEndpoint + "/{scheduleId}", HttpMethod.PUT, new HttpEntity<>(newNomikai),
+                YSchedule.class, Collections.singletonMap("scheduleId", scheduleId));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        nomikai.setParticipants(Arrays.asList(hanako, tarou));
+        nomikai.setScheduleDescription(newNomikai.getScheduleDescription());
+        nomikai.setUpdatedAt(response.getBody().getUpdatedAt());
+        assertThat(response.getBody(), is(nomikai));
+    }
 }

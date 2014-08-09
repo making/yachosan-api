@@ -65,13 +65,13 @@ public class YSchedule implements Serializable {
     /**
      * 作成タイムスタンプ
      */
-    @NotNull
+    //@NotNull
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime createdAt;
     /**
      * 更新タイムスタンプ
      */
-    @NotNull
+    //@NotNull
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime updatedAt;
 }
