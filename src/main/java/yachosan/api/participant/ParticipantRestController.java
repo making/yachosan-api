@@ -41,7 +41,6 @@ public class ParticipantRestController {
         return ResponseEntites.okIfPresent(participant);
     }
 
-
     @RequestMapping(value = "{nickname}", method = RequestMethod.PUT)
     ResponseEntity<YParticipant> putParticipant(@PathVariable("scheduleId") ScheduleId scheduleId, @PathVariable("nickname") String nickname,
                                                 @Validated @RequestBody YParticipant update) {
@@ -50,5 +49,14 @@ public class ParticipantRestController {
             dozerMapper.map(update, p);
             return participantRepository.save(p);
         }));
+    }
+
+    @RequestMapping(value = "{nickname}", method = RequestMethod.DELETE)
+    ResponseEntity<Void> deleteParticipant(@PathVariable("scheduleId") ScheduleId scheduleId, @PathVariable("nickname") String nickname) {
+        Optional<YParticipant> participant = participantRepository.findByParticipantPk(new ParticipantPk(scheduleId, nickname));
+        return ResponseEntites.noContentIfPresent(participant.map((p -> {
+            participantRepository.delete(p);
+            return p;
+        })));
     }
 }

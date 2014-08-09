@@ -273,4 +273,34 @@ public class ParticipantRestControllerTest {
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
     }
 
+    @Test
+    public void testDeleteParticipant() throws Exception {
+        {
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, null /* body,header */,
+                    YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+            assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+        }
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(1));
+
+        {
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, null /* body,header */,
+                    YParticipant.class, Collections.singletonMap("nickname", "tarou"));
+            assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+        }
+    }
+
+    @Test
+    public void testDeleteParticipant_NotFound() throws Exception {
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.DELETE, null /* body,header */,
+                YParticipant.class, Collections.singletonMap("nickname", "foobar"));
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
+
 }

@@ -26,7 +26,12 @@ public class ResponseEntites {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public static <T> ResponseEntity<T> noContent() {
+    public static ResponseEntity<Void> noContent() {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    public static ResponseEntity<Void> noContentIfPresent(Optional<?> body) {
+        return body.map(x -> ResponseEntites.noContent())
+                .orElse(notFound());
     }
 }
