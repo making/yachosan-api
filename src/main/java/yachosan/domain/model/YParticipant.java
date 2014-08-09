@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 
 @Embeddable
 @Data
@@ -61,4 +62,16 @@ public class YParticipant implements Serializable {
     @JoinColumn(name = "schedule_id", insertable = false, updatable = false)
     @JsonIgnore
     private YSchedule schedule;
+
+    @JsonIgnore
+    public Optional<Password> getPasswordOptional() {
+        return Optional.ofNullable(this.password);
+    }
+
+    public YParticipant alreadyPasswordEncoded() {
+        this.getPasswordOptional()
+                .map(Password::alreadyEncoded)
+                .ifPresent(this::setPassword);
+        return this;
+    }
 }

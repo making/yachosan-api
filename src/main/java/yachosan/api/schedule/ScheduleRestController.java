@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import yachosan.api.ResponseEntites;
 import yachosan.domain.model.ScheduleId;
 import yachosan.domain.model.YSchedule;
-import yachosan.domain.repository.schedule.ScheduleRepository;
 import yachosan.domain.repository.schedule.ScheduleSummary;
+import yachosan.domain.service.schedule.ScheduleService;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -19,17 +19,17 @@ import java.util.Optional;
 @RequestMapping("api/v1/schedules")
 public class ScheduleRestController {
     @Inject
-    ScheduleRepository scheduleRepository;
+    ScheduleService scheduleService;
 
 
     @RequestMapping(method = RequestMethod.GET)
     List<ScheduleSummary> getSchedules() {
-        return scheduleRepository.findAllSummaries();
+        return scheduleService.findAllSummaries();
     }
 
     @RequestMapping(value = "{scheduleId}", method = RequestMethod.GET)
     ResponseEntity<YSchedule> getSchedule(@PathVariable("scheduleId") ScheduleId scheduleId) {
-        Optional<YSchedule> schedule = scheduleRepository.findByScheduleId(scheduleId);
+        Optional<YSchedule> schedule = scheduleService.findOne(scheduleId);
         return ResponseEntites.okIfPresent(schedule);
     }
 }

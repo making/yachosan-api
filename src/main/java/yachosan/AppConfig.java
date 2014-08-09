@@ -12,15 +12,19 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import yachosan.domain.model.Password;
 import yachosan.domain.model.ProposedDate;
 import yachosan.domain.model.ScheduleId;
 import yachosan.infra.password.PasswordDeserializer;
+import yachosan.infra.password.PasswordMethodArgumentResolver;
 import yachosan.infra.password.PasswordSerializer;
 import yachosan.infra.proposeddate.ProposedDateDeserializer;
 import yachosan.infra.proposeddate.ProposedDateKeyDeserializer;
@@ -31,6 +35,7 @@ import yachosan.infra.scheduleid.ScheduleIdKeyDeserializer;
 import yachosan.infra.scheduleid.ScheduleIdSerializer;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Configuration
 public class AppConfig {
@@ -55,6 +60,11 @@ public class AppConfig {
     @Bean
     DataSource dataSource() {
         return new DataSourceSpy(this.dataSource);
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return Password.DEFAULT_PASSWORD_ENCODER;
     }
 
     @Bean
@@ -102,5 +112,14 @@ public class AppConfig {
     @Bean
     ScheduleIdConverter scheduleIdConverter() {
         return new ScheduleIdConverter();
+    }
+
+
+    @Configuration
+    public static class WebConfig extends WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter {
+        @Override
+        public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+            argumentResolvers.add(new PasswordMethodArgumentResolver());
+        }
     }
 }

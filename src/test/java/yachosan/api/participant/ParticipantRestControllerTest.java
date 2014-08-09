@@ -10,10 +10,7 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -87,6 +84,7 @@ public class ParticipantRestControllerTest {
             put(ProposedDate.fromString("2014-08-02"), Reply.OK);
             put(ProposedDate.fromString("2014-08-03"), Reply.NG);
         }});
+        hanako.setPassword(new Password.UnmaskedPassword("12345678").encode().get());
 
         participantRepository.save(Arrays.asList(tarou, hanako));
 
@@ -97,6 +95,7 @@ public class ParticipantRestControllerTest {
                 .filter(x -> x instanceof MappingJackson2HttpMessageConverter)
                 .findFirst()
                 .get()).setObjectMapper(objectMapper);
+        hanako.setPassword(Password.MASKED);
     }
 
     @Test
@@ -215,7 +214,6 @@ public class ParticipantRestControllerTest {
         newTarou.setPassword(tarou.getPassword());
 
         assertThat(updated, is(newTarou));
-        System.out.println(updated);
 
         assertThat(restTemplate.exchange(
                 apiEndpoint, HttpMethod.GET, null /* body,header */,
@@ -254,6 +252,56 @@ public class ParticipantRestControllerTest {
                 apiEndpoint, HttpMethod.GET, null /* body,header */,
                 new ParameterizedTypeReference<List<YParticipant>>() {
                 }).getBody().size(), is(2));
+    }
+
+
+    @Test
+    public void testPutParticipant_withAuthorization() throws Exception {
+        YParticipant newHanako = new YParticipant();
+        newHanako.setComment("楽しみです！");
+        newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer 12345678");
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        YParticipant updated = response.getBody();
+
+        newHanako.setEmail(hanako.getEmail());
+        newHanako.setPassword(hanako.getPassword());
+        newHanako.setReplies(hanako.getReplies());
+
+        assertThat(updated, is(newHanako));
+    }
+
+    @Test
+    public void testPutParticipant_withWrongAuthorization() throws Exception {
+        YParticipant newHanako = new YParticipant();
+        newHanako.setComment("楽しみです！");
+        newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer abcdefg");
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+    }
+
+
+    @Test
+    public void testPutParticipant_withoutAuthorization() throws Exception {
+        YParticipant newHanako = new YParticipant();
+        newHanako.setComment("楽しみです！");
+        newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+        HttpHeaders headers = new HttpHeaders();
+        ResponseEntity<YParticipant> response = restTemplate.exchange(
+                apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+        assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
     }
 
     @Test
@@ -301,6 +349,67 @@ public class ParticipantRestControllerTest {
                 apiEndpoint + "/{nickname}", HttpMethod.DELETE, null /* body,header */,
                 YParticipant.class, Collections.singletonMap("nickname", "foobar"));
         assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
+
+
+    @Test
+    public void testDeleteParticipant_withAuthorization() throws Exception {
+        {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer 12345678");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, new HttpEntity<>(headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+
+            assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+        }
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(1));
+
+        {
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, null /* body,header */,
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+        }
+    }
+
+    @Test
+    public void testDeleteParticipant_withWrongAuthorization() throws Exception {
+        {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer abcdef");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, new HttpEntity<>(headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+
+            assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        }
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(2));
+    }
+
+    @Test
+    public void testDeleteParticipant_withoutAuthorization() throws Exception {
+        {
+            HttpHeaders headers = new HttpHeaders();
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.DELETE, new HttpEntity<>(headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+
+            assertThat(response.getStatusCode(), is(HttpStatus.UNAUTHORIZED));
+        }
+
+        assertThat(restTemplate.exchange(
+                apiEndpoint, HttpMethod.GET, null /* body,header */,
+                new ParameterizedTypeReference<List<YParticipant>>() {
+                }).getBody().size(), is(2));
     }
 
 }
