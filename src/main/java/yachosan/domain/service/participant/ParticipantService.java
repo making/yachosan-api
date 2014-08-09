@@ -21,25 +21,25 @@ public class ParticipantService {
 
     public List<YParticipant> findByScheduleId(ScheduleId scheduleId) {
         return participantRepository.findByScheduleId(scheduleId).stream()
-                .map(YParticipant::alreadyPasswordEncoded)
+                .map(p -> p.alreadyPasswordEncoded())
                 .collect(Collectors.toList());
     }
 
     public Optional<YParticipant> findOne(ScheduleId scheduleId, String nickname) {
         return participantRepository.findByParticipantPk(new ParticipantPk(scheduleId, nickname))
-                .map(YParticipant::alreadyPasswordEncoded);
+                .map(p -> p.alreadyPasswordEncoded());
     }
 
     public YParticipant create(YParticipant participant, Optional<Password> rawPassword) {
         rawPassword
-                .flatMap(Password::encode)
+                .flatMap(p -> p.encode())
                 .ifPresent(participant::setPassword);
         return participantRepository.save(participant);
     }
 
     void authorize(Optional<Password> originalEncodedPassword, Optional<Password> originalRawPassword) {
         originalEncodedPassword
-                .map(Password::alreadyEncoded)
+                .map(p -> p.alreadyEncoded())
                 .map(p -> {
                     if (!originalRawPassword.isPresent()) {
                         throw new AuthorizationRequiredException();
