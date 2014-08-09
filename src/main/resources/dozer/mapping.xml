@@ -5,7 +5,7 @@
     <configuration>
         <map-null>false</map-null>
         <custom-converters>
-            <converter type="yachosan.infra.password.PasswordDozerConverter">
+            <converter type="yachosan.infra.model.password.PasswordDozerConverter">
                 <class-a>yachosan.domain.model.Password</class-a>
                 <class-b>yachosan.domain.model.Password</class-b>
             </converter>

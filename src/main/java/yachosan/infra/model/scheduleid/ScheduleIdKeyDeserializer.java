@@ -1,4 +1,4 @@
-package yachosan.infra.scheduleid;
+package yachosan.infra.model.scheduleid;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;

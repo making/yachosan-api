@@ -1,4 +1,4 @@
-package yachosan.infra.proposeddate;
+package yachosan.infra.model.proposeddate;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;

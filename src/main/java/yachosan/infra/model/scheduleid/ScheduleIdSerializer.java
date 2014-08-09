@@ -1,4 +1,4 @@
-package yachosan.infra.scheduleid;
+package yachosan.infra.model.scheduleid;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;

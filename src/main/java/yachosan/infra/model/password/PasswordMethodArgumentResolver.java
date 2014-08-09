@@ -1,4 +1,4 @@
-package yachosan.infra.password;
+package yachosan.infra.model.password;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;

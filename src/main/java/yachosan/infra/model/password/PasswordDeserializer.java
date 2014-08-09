@@ -1,4 +1,4 @@
-package yachosan.infra.password;
+package yachosan.infra.model.password;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

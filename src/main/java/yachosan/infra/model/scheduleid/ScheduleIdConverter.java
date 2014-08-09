@@ -1,4 +1,4 @@
-package yachosan.infra.scheduleid;
+package yachosan.infra.model.scheduleid;
 
 import org.springframework.core.convert.converter.Converter;
 import yachosan.domain.model.ScheduleId;

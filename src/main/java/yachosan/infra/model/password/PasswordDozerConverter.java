@@ -1,4 +1,4 @@
-package yachosan.infra.password;
+package yachosan.infra.model.password;
 
 import org.dozer.DozerConverter;
 import yachosan.domain.model.Password;
