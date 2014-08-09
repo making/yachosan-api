@@ -64,10 +64,21 @@ public class Password implements Serializable {
             this.encoded = encoded;
         }
 
+        @Override
+        public Optional<EncodedPassword> encode(PasswordEncoder passwordEncoder) {
+            return Optional.of(this);
+        }
+
+        @Override
+        public Optional<EncodedPassword> encode() {
+            return Optional.of(this);
+        }
+
         public boolean matches(PasswordEncoder encoder, Optional<Password> rawPassword) {
-            return rawPassword
+            boolean matches = rawPassword
                     .map(p -> encoder.matches(CharBuffer.wrap(p.getValue()), encoded))
                     .orElse(Boolean.FALSE);
+            return matches;
         }
 
         public boolean matches(Optional<Password> rawPassword) {

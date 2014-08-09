@@ -4,5 +4,11 @@
           xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
     <configuration>
         <map-null>false</map-null>
+        <custom-converters>
+            <converter type="yachosan.infra.password.PasswordDozerConverter">
+                <class-a>yachosan.domain.model.Password</class-a>
+                <class-b>yachosan.domain.model.Password</class-b>
+            </converter>
+        </custom-converters>
     </configuration>
 </mappings>

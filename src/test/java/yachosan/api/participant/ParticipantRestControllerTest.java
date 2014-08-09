@@ -276,6 +276,108 @@ public class ParticipantRestControllerTest {
         assertThat(updated, is(newHanako));
     }
 
+
+    @Test
+    public void testPutParticipant_withAuthorizationTwice() throws Exception {
+        {
+            YParticipant newHanako = new YParticipant();
+            newHanako.setComment("楽しみです！");
+            newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer 12345678");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            YParticipant updated = response.getBody();
+
+            newHanako.setEmail(hanako.getEmail());
+            newHanako.setPassword(hanako.getPassword());
+            newHanako.setReplies(hanako.getReplies());
+
+            assertThat(updated, is(newHanako));
+        }
+
+        {
+            YParticipant newHanako = new YParticipant();
+            newHanako.setComment("楽しみです！");
+            newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer 12345678");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            YParticipant updated = response.getBody();
+
+            newHanako.setEmail(hanako.getEmail());
+            newHanako.setPassword(hanako.getPassword());
+            newHanako.setReplies(hanako.getReplies());
+
+            assertThat(updated, is(newHanako));
+        }
+    }
+
+
+    @Test
+    public void testPutParticipant_withAuthorizationAndPasswordChange() throws Exception {
+        {
+            YParticipant newHanako = new YParticipant();
+            newHanako.setComment("楽しみです！");
+            newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+            newHanako.setPassword(new Password.UnmaskedPassword("abcdefgh"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer 12345678");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            YParticipant updated = response.getBody();
+
+            newHanako.setEmail(hanako.getEmail());
+            newHanako.setPassword(hanako.getPassword());
+            newHanako.setReplies(hanako.getReplies());
+
+            assertThat(updated, is(newHanako));
+        }
+
+        {
+            YParticipant newHanako = new YParticipant();
+            newHanako.setComment("楽しみです！");
+            newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer 12345678");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        }
+
+        {
+            YParticipant newHanako = new YParticipant();
+            newHanako.setComment("楽しみです！");
+            newHanako.setParticipantPk(new ParticipantPk(scheduleId, "hanako"));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer abcdefgh");
+            ResponseEntity<YParticipant> response = restTemplate.exchange(
+                    apiEndpoint + "/{nickname}", HttpMethod.PUT, new HttpEntity<>(newHanako, headers),
+                    YParticipant.class, Collections.singletonMap("nickname", "hanako"));
+            assertThat(response.getStatusCode(), is(HttpStatus.OK));
+            YParticipant updated = response.getBody();
+
+            newHanako.setEmail(hanako.getEmail());
+            newHanako.setPassword(hanako.getPassword());
+            newHanako.setReplies(hanako.getReplies());
+
+            assertThat(updated, is(newHanako));
+        }
+    }
+
     @Test
     public void testPutParticipant_withWrongAuthorization() throws Exception {
         YParticipant newHanako = new YParticipant();

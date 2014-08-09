@@ -47,9 +47,11 @@ public class ParticipantRestController {
                                                 Password password) {
         Optional<YParticipant> participant = participantService.findOne(scheduleId, nickname);
         return ResponseEntites.okIfPresent(participant.map(p -> {
+            Optional<Password> originalEncodedPassword = p.getPasswordOptional();
             dozerMapper.map(update, p);
             return participantService.update(p,
                     p.getPasswordOptional(),
+                    originalEncodedPassword,
                     Optional.ofNullable(password));
         }));
     }

@@ -1,6 +1,5 @@
 package yachosan.domain.service.participant;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import yachosan.domain.model.ParticipantPk;
 import yachosan.domain.model.Password;
 import yachosan.domain.model.ScheduleId;
@@ -19,9 +18,6 @@ import java.util.stream.Collectors;
 public class ParticipantService {
     @Inject
     ParticipantRepository participantRepository;
-    @Inject
-    PasswordEncoder passwordEncoder;
-
 
     public List<YParticipant> findByScheduleId(ScheduleId scheduleId) {
         return participantRepository.findByScheduleId(scheduleId).stream()
@@ -36,13 +32,13 @@ public class ParticipantService {
 
     public YParticipant create(YParticipant participant, Optional<Password> rawPassword) {
         rawPassword
-                .flatMap(p -> p.encode(passwordEncoder))
+                .flatMap(Password::encode)
                 .ifPresent(participant::setPassword);
         return participantRepository.save(participant);
     }
 
-    void authorize(YParticipant participant, Optional<Password> originalRawPassword) {
-        participant.getPasswordOptional()
+    void authorize(Optional<Password> originalEncodedPassword, Optional<Password> originalRawPassword) {
+        originalEncodedPassword
                 .map(Password::alreadyEncoded)
                 .map(p -> {
                     if (!originalRawPassword.isPresent()) {
@@ -50,25 +46,27 @@ public class ParticipantService {
                     }
                     return p;
                 })
-                .map(p -> p.matches(passwordEncoder, originalRawPassword))
-                .map(matches -> {
+                .map(p -> p.matches(originalRawPassword))
+                .ifPresent(matches -> {
                     if (!matches) {
                         throw new AuthorizationFailedException();
                     }
-                    return true;
                 });
     }
 
-    public YParticipant update(YParticipant participant, Optional<Password> newRawPassword, Optional<Password> originalRawPassword) {
-        authorize(participant, originalRawPassword);
+    public YParticipant update(YParticipant participant,
+                               Optional<Password> newRawPassword,
+                               Optional<Password> originalEncodedPassword,
+                               Optional<Password> confirmRawPassword) {
+        authorize(originalEncodedPassword, confirmRawPassword);
         newRawPassword
-                .flatMap(p -> p.encode(passwordEncoder))
+                .flatMap(p -> p.encode())
                 .ifPresent(participant::setPassword);
         return participantRepository.save(participant);
     }
 
-    public void delete(YParticipant participant, Optional<Password> originalRawPassword) {
-        authorize(participant, originalRawPassword);
+    public void delete(YParticipant participant, Optional<Password> confirmRawPassword) {
+        authorize(participant.getPasswordOptional(), confirmRawPassword);
         participantRepository.delete(participant);
     }
 

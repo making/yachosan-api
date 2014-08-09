@@ -69,9 +69,9 @@ public class YParticipant implements Serializable {
     }
 
     public YParticipant alreadyPasswordEncoded() {
-        this.getPasswordOptional()
-                .map(Password::alreadyEncoded)
-                .ifPresent(this::setPassword);
+        this.getPasswordOptional().ifPresent(p -> {
+            this.setPassword(p.alreadyEncoded());
+        });
         return this;
     }
 }
