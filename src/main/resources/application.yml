@@ -1,8 +1,8 @@
 spring:
+  profle:
+    active: dev
   main:
     show-banner: false
-  datasource:
-    url: jdbc:h2:file:${yachosan.h2.datadir:/tmp}/yachosan
   main:
     show-banner: false
   jpa.hibernate.ddl-auto: validate
@@ -13,3 +13,18 @@ security:
   basic:
     enabled: false
 server.tomcat.access_log_enabled: true
+
+---
+spring:
+    profiles: dev
+    datasource:
+      url: jdbc:h2:file:${yachosan.h2.datadir:/tmp}/yachosan
+    jpa:
+      database: H2
+---
+spring:
+    profiles: heroku
+    datasource:
+      driverClassName: org.postgresql.Driver
+    jpa:
+      database: POSTGRESQL

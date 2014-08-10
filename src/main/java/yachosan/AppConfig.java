@@ -35,6 +35,8 @@ import yachosan.infra.model.scheduleid.ScheduleIdKeyDeserializer;
 import yachosan.infra.model.scheduleid.ScheduleIdSerializer;
 
 import javax.sql.DataSource;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Configuration
@@ -47,12 +49,28 @@ public class AppConfig {
 
     @ConfigurationProperties(prefix = DataSourceAutoConfiguration.CONFIGURATION_PREFIX)
     @Bean
-    DataSource realDataSource() {
+    DataSource realDataSource() throws URISyntaxException {
+        String url;
+        String username;
+        String password;
+
+        String databaseUrl = System.getenv("DATABASE_URL");
+        if (databaseUrl != null) {
+            URI dbUri = new URI(databaseUrl);
+            url = "jdbc:" + dbUri.getScheme() + "://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+            username = dbUri.getUserInfo().split(":")[0];
+            password = dbUri.getUserInfo().split(":")[1];
+        } else {
+            url = this.dataSourceProperties.getUrl();
+            username = this.dataSourceProperties.getUsername();
+            password = this.dataSourceProperties.getPassword();
+        }
+
         DataSourceBuilder factory = DataSourceBuilder
                 .create(this.dataSourceProperties.getClassLoader())
-                .url(this.dataSourceProperties.getUrl())
-                .username(this.dataSourceProperties.getUsername())
-                .password(this.dataSourceProperties.getPassword());
+                .url(url)
+                .username(username)
+                .password(password);
         this.dataSource = factory.build();
         return this.dataSource;
     }
