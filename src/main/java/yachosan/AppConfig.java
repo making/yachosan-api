@@ -57,7 +57,7 @@ public class AppConfig {
         String databaseUrl = System.getenv("DATABASE_URL");
         if (databaseUrl != null) {
             URI dbUri = new URI(databaseUrl);
-            url = "jdbc:" + dbUri.getScheme() + "://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+            url = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
             username = dbUri.getUserInfo().split(":")[0];
             password = dbUri.getUserInfo().split(":")[1];
         } else {
