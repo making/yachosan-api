@@ -57,6 +57,7 @@ public class YParticipant implements Serializable {
      */
     @Email
     @Size(max = 127)
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private String email;
     /**
      * スケジュール

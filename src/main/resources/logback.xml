@@ -5,4 +5,5 @@
     <logger name="jdbc.sqltiming" level="DEBUG"/>
     <logger name="jdbc.resultsettable" level="ERROR"/>
     <logger name="org.hibernate" level="WARN"/>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="ERROR" />
 </configuration>
