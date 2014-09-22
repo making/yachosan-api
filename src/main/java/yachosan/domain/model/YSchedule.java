@@ -1,5 +1,6 @@
 package yachosan.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -61,6 +62,7 @@ public class YSchedule implements Serializable {
      * 合言葉
      */
     @Embedded
+    @JsonIgnore
     private Aikotoba aikotoba;
     /**
      * 作成タイムスタンプ

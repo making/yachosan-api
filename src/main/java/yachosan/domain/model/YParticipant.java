@@ -2,6 +2,7 @@ package yachosan.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,11 +34,13 @@ public class YParticipant implements Serializable {
      * パスワード
      */
     @Embedded
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private Password password;
     /**
      * 一言
      */
     @Size(min = 1, max = 200)
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private String comment;
     /**
      * 回答リスト
