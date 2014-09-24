@@ -9,6 +9,22 @@
                 <class-a>yachosan.domain.model.Password</class-a>
                 <class-b>yachosan.domain.model.Password</class-b>
             </converter>
+            <converter type="yachosan.infra.model.proposeddate.ProposedDateDozerConverter">
+                <class-a>yachosan.domain.model.ProposedDate</class-a>
+                <class-b>yachosan.domain.model.ProposedDate</class-b>
+            </converter>
+            <converter type="yachosan.infra.model.scheduleid.ScheduleIdDozerConverter">
+                <class-a>yachosan.domain.model.ScheduleId</class-a>
+                <class-b>yachosan.domain.model.ScheduleId</class-b>
+            </converter>
         </custom-converters>
     </configuration>
+    <mapping map-null="false">
+        <class-a>yachosan.domain.model.YSchedule</class-a>
+        <class-b>yachosan.domain.model.YSchedule</class-b>
+        <field relationship-type="non-cumulative" remove-orphans="true">
+            <a>proposedDates</a>
+            <b>proposedDates</b>
+        </field>
+    </mapping>
 </mappings>

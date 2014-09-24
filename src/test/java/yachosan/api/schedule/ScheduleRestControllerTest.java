@@ -172,4 +172,71 @@ public class ScheduleRestControllerTest {
         nomikai.setUpdatedAt(response.getBody().getUpdatedAt());
         assertThat(response.getBody(), is(nomikai));
     }
+
+    @Test
+    public void testPutSchedule_addProposedDates() throws Exception {
+        YSchedule newNomikai = new YSchedule();
+        newNomikai.setScheduleName("飲み会");
+        newNomikai.setScheduleDescription("期限はもう少しです。");
+        newNomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-02"),
+                ProposedDate.fromString("2014-08-03"),
+                ProposedDate.fromString("2014-08-04")));
+        ResponseEntity<YSchedule> response = restTemplate.exchange(
+                apiEndpoint + "/{scheduleId}", HttpMethod.PUT, new HttpEntity<>(newNomikai),
+                YSchedule.class, Collections.singletonMap("scheduleId", scheduleId));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        nomikai.setParticipants(Arrays.asList(hanako, tarou));
+        nomikai.setScheduleDescription(newNomikai.getScheduleDescription());
+        nomikai.setUpdatedAt(response.getBody().getUpdatedAt());
+        nomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-02"),
+                ProposedDate.fromString("2014-08-03"),
+                ProposedDate.fromString("2014-08-04")));
+        assertThat(response.getBody(), is(nomikai));
+    }
+
+    @Test
+    public void testPutSchedule_removeProposedDates() throws Exception {
+        YSchedule newNomikai = new YSchedule();
+        newNomikai.setScheduleName("飲み会");
+        newNomikai.setScheduleDescription("期限はもう少しです。");
+        newNomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-03")));
+        ResponseEntity<YSchedule> response = restTemplate.exchange(
+                apiEndpoint + "/{scheduleId}", HttpMethod.PUT, new HttpEntity<>(newNomikai),
+                YSchedule.class, Collections.singletonMap("scheduleId", scheduleId));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        nomikai.setParticipants(Arrays.asList(hanako, tarou));
+        nomikai.setScheduleDescription(newNomikai.getScheduleDescription());
+        nomikai.setUpdatedAt(response.getBody().getUpdatedAt());
+        nomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-03")));
+        assertThat(response.getBody(), is(nomikai));
+    }
+
+    @Test
+    public void testPutSchedule_removeAndAddProposedDates() throws Exception {
+        YSchedule newNomikai = new YSchedule();
+        newNomikai.setScheduleName("飲み会");
+        newNomikai.setScheduleDescription("期限はもう少しです。");
+        newNomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-04")));
+        ResponseEntity<YSchedule> response = restTemplate.exchange(
+                apiEndpoint + "/{scheduleId}", HttpMethod.PUT, new HttpEntity<>(newNomikai),
+                YSchedule.class, Collections.singletonMap("scheduleId", scheduleId));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        nomikai.setParticipants(Arrays.asList(hanako, tarou));
+        nomikai.setScheduleDescription(newNomikai.getScheduleDescription());
+        nomikai.setUpdatedAt(response.getBody().getUpdatedAt());
+        nomikai.setProposedDates(Arrays.asList(
+                ProposedDate.fromString("2014-08-01"),
+                ProposedDate.fromString("2014-08-04")));
+        assertThat(response.getBody(), is(nomikai));
+    }
 }
