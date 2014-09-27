@@ -1,4 +1,4 @@
-package yachosan.domain.service.participant;
+package yachosan.domain.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

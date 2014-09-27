@@ -5,6 +5,8 @@ import yachosan.domain.model.Password;
 import yachosan.domain.model.ScheduleId;
 import yachosan.domain.model.YParticipant;
 import yachosan.domain.repository.participant.ParticipantRepository;
+import yachosan.domain.service.AuthorizationFailedException;
+import yachosan.domain.service.AuthorizationRequiredException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
