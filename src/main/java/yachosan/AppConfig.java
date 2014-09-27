@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import yachosan.domain.model.Password;
@@ -41,6 +42,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 @Configuration
+@EnableScheduling
 public class AppConfig {
     @Autowired
     DataSourceProperties dataSourceProperties;
