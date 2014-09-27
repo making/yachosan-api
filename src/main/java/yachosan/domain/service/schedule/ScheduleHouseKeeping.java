@@ -27,7 +27,7 @@ public class ScheduleHouseKeeping {
     @Scheduled(fixedRate = 1_000 * 60 * 60 * 1 /* 1h */, initialDelay = 3_000)
     public void cleanSchedule() {
         LocalDateTime cleanDateTime = LocalDateTime.now().minusDays(cleanIntervalDay);
-        List<YSchedule> target = scheduleRepository.findAllBeforeCleanDateTime(cleanDateTime);
+        List<YSchedule> target = scheduleRepository.findAllNoParticipantsBeforeCleanDateTime(cleanDateTime);
         scheduleRepository.delete(target);
         if (logger.isInfoEnabled()) {
             logger.info("Delete schedules {}", target.stream().map(YSchedule::getScheduleId));

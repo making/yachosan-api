@@ -20,6 +20,6 @@ public interface ScheduleRepository extends JpaRepository<YSchedule, ScheduleId>
             "FROM YSchedule x  ORDER BY x.updatedAt DESC")
     List<ScheduleSummary> findAllSummaries();
 
-    @Query("SELECT x FROM YSchedule x WHERE x.updatedAt < :cleanDateTime")
-    List<YSchedule> findAllBeforeCleanDateTime(@Param("cleanDateTime") LocalDateTime cleanDateTime);
+    @Query("SELECT x FROM YSchedule x WHERE x.updatedAt < :cleanDateTime AND x.participants.size = 0")
+    List<YSchedule> findAllNoParticipantsBeforeCleanDateTime(@Param("cleanDateTime") LocalDateTime cleanDateTime);
 }
