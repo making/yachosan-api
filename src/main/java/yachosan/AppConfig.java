@@ -23,6 +23,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import yachosan.domain.model.Password;
 import yachosan.domain.model.ProposedDate;
 import yachosan.domain.model.ScheduleId;
+import yachosan.infra.model.aikotoba.AikotobaMethodArgumentResolver;
 import yachosan.infra.model.password.PasswordDeserializer;
 import yachosan.infra.model.password.PasswordMethodArgumentResolver;
 import yachosan.infra.model.password.PasswordSerializer;
@@ -138,6 +139,7 @@ public class AppConfig {
         @Override
         public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
             argumentResolvers.add(new PasswordMethodArgumentResolver());
+            argumentResolvers.add(new AikotobaMethodArgumentResolver());
         }
     }
 }

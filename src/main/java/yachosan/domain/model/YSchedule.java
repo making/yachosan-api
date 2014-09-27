@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -76,4 +77,9 @@ public class YSchedule implements Serializable {
     //@NotNull
     @Type(type = "org.jadira.usertype.dateandtime.threeten.PersistentLocalDateTime")
     private LocalDateTime updatedAt;
+
+    @JsonIgnore
+    public Optional<Aikotoba> getAikotobaOptional() {
+        return Optional.ofNullable(aikotoba);
+    }
 }
