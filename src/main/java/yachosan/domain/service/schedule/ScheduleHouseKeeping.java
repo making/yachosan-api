@@ -12,6 +12,7 @@ import yachosan.domain.repository.schedule.ScheduleRepository;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,7 +31,7 @@ public class ScheduleHouseKeeping {
         List<YSchedule> target = scheduleRepository.findAllNoParticipantsBeforeCleanDateTime(cleanDateTime);
         scheduleRepository.delete(target);
         if (logger.isInfoEnabled()) {
-            logger.info("Delete schedules {}", target.stream().map(YSchedule::getScheduleId));
+            logger.info("Delete schedules {}", target.stream().map(YSchedule::getScheduleId).collect(Collectors.toList()));
         }
     }
 }
